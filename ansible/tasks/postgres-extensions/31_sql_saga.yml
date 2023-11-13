@@ -1,0 +1,22 @@
+# sql_saga
+- name: sql_saga - download from master branch
+  git:
+    repo: https://github.com/veridit/sql_saga.git
+    dest: /tmp/sql_saga
+    version: "{{ sql_saga_release }}"
+
+- name: sql_saga - build
+  make:
+    chdir: /tmp/sql_saga
+  become: yes
+
+- name: sql_saga - install
+  make:
+    chdir: /tmp/sql_saga
+    target: install
+  become: yes
+
+- name: sql_saga - cleanup
+  file:
+    state: absent
+    path: /tmp/sql_saga

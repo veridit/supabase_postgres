@@ -38,6 +38,7 @@ ARG pg_tle_release=1.3.2
 ARG index_advisor_release=0.2.0
 ARG supautils_release=2.2.1
 ARG wal_g_release=2.0.1
+ARG sql_saga_release=c65b6f850f3d123003b073fa59c666f1d44e7021
 
 ####################
 # Setup Postgres PPA
@@ -818,6 +819,22 @@ RUN --mount=type=cache,target=/ccache,from=public.ecr.aws/supabase/postgres:ccac
 # Create debian package
 RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --nodoc
 
+
+####################
+# 31-sql_saga.yml
+####################
+FROM ccache as sql_saga-source
+# Download and extract
+ARG sql_saga_release
+ADD "https://github.com/veridit/sql_saga.git#${sql_saga_release}" \
+    /tmp/sql_saga-${sql_saga_release}
+# Build from source
+WORKDIR /tmp/sql_saga-${sql_saga_release}
+RUN make -j$(nproc)
+# Create debian package
+RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --pkgversion=1 --nodoc
+
+
 ####################
 # internal/supautils.yml
 ####################
@@ -899,6 +916,7 @@ COPY --from=pgvector-source /tmp/*.deb /tmp/
 COPY --from=pg_tle-source /tmp/*.deb /tmp/
 COPY --from=index_advisor /tmp/*.deb /tmp/
 COPY --from=supautils /tmp/*.deb /tmp/
+COPY --from=sql_saga-source /tmp/*.deb /tmp/
 
 ####################
 # Download gosu for easy step-down from root
