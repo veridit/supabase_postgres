@@ -78,7 +78,9 @@ See all installation instructions in the [repo wiki](https://github.com/supabase
 | Supabase Postgres: PostgREST Bundle | Coming Soon | Coming Soon | Coming Soon |
 | Supabase Postgres: Complete Bundle | Coming Soon | Coming Soon | Coming Soon |
 
-### Quick Build
+### Quick Cloud Build
+
+Uses Amazon build cluster.
 
 ```bash
 $ time packer build -timestamp-ui \
@@ -87,6 +89,24 @@ $ time packer build -timestamp-ui \
   --var "ami_regions=<insert desired regions>" \
   amazon-arm.json
 ```
+
+### Quick Local Build
+
+Uses docker
+```bash
+# Setup a docker buildx instance, if not already present.
+docker buildx inspect || docker buildx create --use
+# Build all architectures
+docker buildx build \
+  $(yq 'to_entries | map(select(.value|type == "!!str")) |  map(" --build-arg " + .key + "=" + .value) | join("")' 'ansible/vars.yml') \
+  --target production \
+  --tag 'custom_supabase_postgres' \
+  --platform 'linux/arm64/v8,linux/amd64' \
+  --load \
+  .
+```
+
+After this you can use the `docker run custom_supabase_postgres` command to start your local instance.
 
 ## Motivation
 
