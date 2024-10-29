@@ -9,10 +9,10 @@ set -e
 # Fallback to uname -m if TARGETARCH is not set
 TARGETARCH=${TARGETARCH:-$(uname -m)}
 
-if [ "$TARGETARCH" = "amd64" ]; then
+if [ "$TARGETARCH" = "x86_64" ] || [ "$TARGETARCH" = "amd64" ]; then
     CHECKSUM="${supautils_release_amd64_deb_checksum}"
     ARCH="amd64"
-elif [ "$TARGETARCH" = "arm64" ]; then
+elif [ "$TARGETARCH" = "arm64" ] || [ "$TARGETARCH" = "aarch64" ]; then
     CHECKSUM="${supautils_release_arm64_deb_checksum}"
     ARCH="arm64"
 else
