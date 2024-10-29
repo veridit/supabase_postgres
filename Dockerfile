@@ -990,6 +990,18 @@ EXPOSE 5432
 
 ENV POSTGRES_HOST=/var/run/postgresql
 ENV POSTGRES_USER=supabase_admin
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    locales \
+    && rm -rf /var/lib/apt/lists/* && \
+    localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8 \
+    && localedef -i C -c -f UTF-8 -A /usr/share/locale/locale.alias C.UTF-8 
+RUN echo "C.UTF-8 UTF-8" > /etc/locale.gen && echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen && locale-gen
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US:en
+ENV LC_ALL en_US.UTF-8
+ENV LC_CTYPE=C.UTF-8
+ENV LC_COLLATE=C.UTF-8
+ENV LOCALE_ARCHIVE /usr/lib/locale/locale-archive
 CMD ["postgres", "-D", "/etc/postgresql"]
 
 ####################
