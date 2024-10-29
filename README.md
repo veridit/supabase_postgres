@@ -80,7 +80,9 @@ See all installation instructions in the [repo wiki](https://github.com/supabase
 | Supabase Postgres: PostgREST Bundle | Coming Soon | Coming Soon | Coming Soon |
 | Supabase Postgres: Complete Bundle | Coming Soon | Coming Soon | Coming Soon |
 
-### Quick Build
+### Quick Cloud Build
+
+Uses Amazon build cluster.
 
 ```bash
 $ time packer build -timestamp-ui \
@@ -88,6 +90,19 @@ $ time packer build -timestamp-ui \
   --var "aws_secret_key=<insert aws secret key>" \
   --var "ami_regions=<insert desired regions>" \
   amazon-arm.json
+```
+
+### Quick Local Build
+
+Uses docker
+```bash
+docker buildx build \
+  $(yq 'to_entries | map(select(.value|type == "!!str")) |  map(" --build-arg " + .key + "=" + .value) | join("")' 'ansible/vars.yml') \
+  --target production \
+  --tag 'custom_supabase_postgres' \
+  --platform 'linux/arm64/v8,linux/amd64' \
+  --load \
+  .
 ```
 
 ## Motivation
